@@ -34,7 +34,7 @@ import useRangeViewDates from './hooks/useRangeViewDates';
 import type { DateRender } from './panels/DatePanel/DateBody';
 import useHoverValue from './hooks/useHoverValue';
 import { legacyPropsWarning } from './utils/warnUtil';
-
+import { ConfigContext } from './RangePickerContext';
 function reorderValues<DateType>(
   values: RangeValue<DateType>,
   generateConfig: GenerateConfig<DateType>,
@@ -226,6 +226,8 @@ function InnerRangePicker<DateType>(props: RangePickerProps<DateType>) {
     activePickerIndex,
     autoComplete = 'off',
   } = props as MergedRangePickerProps<DateType>;
+
+  const contextConfig = React.useContext(ConfigContext);
 
   const needConfirmButton: boolean = (picker === 'date' && !!showTime) || picker === 'time';
 
@@ -459,6 +461,8 @@ function InnerRangePicker<DateType>(props: RangePickerProps<DateType>) {
     const canStartValueTrigger = canValueTrigger(startValue, 0, mergedDisabled, allowEmpty);
     const canEndValueTrigger = canValueTrigger(endValue, 1, mergedDisabled, allowEmpty);
 
+    //  enableSelectTwiceWhenClickLeft === true ? canEndValueTriggerCase2 : canEndValueTriggerCase1;
+
     const canTrigger = values === null || (canStartValueTrigger && canEndValueTrigger);
 
     if (canTrigger) {
@@ -482,6 +486,10 @@ function InnerRangePicker<DateType>(props: RangePickerProps<DateType>) {
       nextOpenIndex = 1;
     } else if (sourceIndex === 1 && !mergedDisabled[0]) {
       nextOpenIndex = 0;
+    }
+    // 增加快速关闭
+    if (contextConfig?.fastClose === true && values[0] <= values[1]) {
+      nextOpenIndex = null;
     }
 
     if (
