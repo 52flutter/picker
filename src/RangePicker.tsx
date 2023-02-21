@@ -488,7 +488,13 @@ function InnerRangePicker<DateType>(props: RangePickerProps<DateType>) {
       nextOpenIndex = 0;
     }
     // 增加快速关闭
-    if (contextConfig?.fastClose === true && values[0] <= values[1]) {
+    if (
+      contextConfig?.fastClose === true &&
+      values?.length &&
+      values[0] &&
+      values[1] &&
+      generateConfig.isAfter(values[1], values[0])
+    ) {
       nextOpenIndex = null;
     }
 

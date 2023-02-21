@@ -34,6 +34,7 @@ import useTextValueMapping from './hooks/useTextValueMapping';
 import useValueTexts from './hooks/useValueTexts';
 import useHoverValue from './hooks/useHoverValue';
 import { legacyPropsWarning } from './utils/warnUtil';
+import { ConfigContext as PickerContext } from './PickerContext';
 
 export type PickerRefConfig = {
   focus: () => void;
@@ -178,6 +179,8 @@ function InnerPicker<DateType>(props: PickerProps<DateType>) {
     autoComplete = 'off',
     inputRender,
   } = props as MergedPickerProps<DateType>;
+
+  const pickerContext = React.useContext(PickerContext);
 
   const inputRef = React.useRef<HTMLInputElement>(null);
 
@@ -463,7 +466,11 @@ function InnerPicker<DateType>(props: PickerProps<DateType>) {
     id,
     tabIndex,
     disabled,
-    readOnly: inputReadOnly || typeof formatList[0] === 'function' || !typing,
+    readOnly:
+      inputReadOnly ||
+      typeof formatList[0] === 'function' ||
+      !typing ||
+      pickerContext.inputReadOnly === true,
     value: hoverValue || text,
     onChange: (e) => {
       triggerTextChange(e.target.value);
